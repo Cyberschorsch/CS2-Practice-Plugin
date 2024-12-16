@@ -85,7 +85,7 @@ public class CSPraccPlugin : BasePlugin, IPluginConfig<CSPraccConfig>
         });
         Instance = this;
         SwitchMode(Config!.ModeToLoad, hotReload);
-        Logger.LogInformation("Pracitce Plugin loaded.");
+        Logger.LogInformation("Practice Plugin loaded.");
     }
 
     /// <summary>
