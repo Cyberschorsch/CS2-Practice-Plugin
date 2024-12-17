@@ -9,7 +9,7 @@ using System.Xml.Serialization;
 namespace CSPracc.DataModules
 {
     /// <summary>
-    /// This Class shall represent a grenade saved by a player in the pracitce mode
+    /// This Class shall represent a grenade saved by a player in the practice mode.
     /// </summary>
     public class SavedNade
     {
@@ -89,11 +89,11 @@ namespace CSPracc.DataModules
         [XmlAttribute("ID")]
         public int ID { get; set; }
 
-        public SavedNade(CounterStrikeSharp.API.Modules.Utils.Vector palyerPos, CounterStrikeSharp.API.Modules.Utils.QAngle playerangle, CounterStrikeSharp.API.Modules.Utils.Vector grenadeCord,  string title, string description, string map, int id) 
+        public SavedNade(CounterStrikeSharp.API.Modules.Utils.Vector playerPos, CounterStrikeSharp.API.Modules.Utils.QAngle playerangle, CounterStrikeSharp.API.Modules.Utils.Vector grenadeCord,  string title, string description, string map, int id) 
         {
-            PlayerPositionX = palyerPos.X;
-            PlayerPositionY = palyerPos.Y;
-            PlayerPositionZ = palyerPos.Z+4;
+            PlayerPositionX = playerPos.X;
+            PlayerPositionY = playerPos.Y;
+            PlayerPositionZ = playerPos.Z+4;
             PlayerAngleX = playerangle.X;
             PlayerAngleY = playerangle.Y;
             PlayerAngleZ = playerangle.Z;
