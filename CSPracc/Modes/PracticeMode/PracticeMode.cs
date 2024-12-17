@@ -1,5 +1,6 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Core.Capabilities;
 using CounterStrikeSharp.API.Modules.Utils;
 using CSPracc.CommandHandler;
 using CSPracc.DataModules;
@@ -12,12 +13,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static CSPracc.DataModules.Enums;
+using T3MenuSharedApi;
 
 namespace CSPracc.Modes
 {
     public class PracticeMode : BaseMode
     {
         BotReplayManager BotReplayManager { get; set; }
+        
+        public IT3MenuManager? MenuManager;
+        public static PluginCapability<IT3MenuManager> IT3MenuCapability { get; } = new("t3menu:manager");
   
         /// <summary>
         /// Get settings
@@ -231,8 +236,36 @@ namespace CSPracc.Modes
         {
             if (player == null) return;
             if(!player.IsValid) return;
+            ShowT3Menu(player, projectileManager.GetPlayerBasedNadeMenu(player,tag,name));
+        }
+        
+        // get the instance
+        public IT3MenuManager? GetMenuManager()
+        {
+            if (MenuManager == null)
+                MenuManager = IT3MenuCapability.Get();
 
-            GuiManager.AddMenu(player.SteamID, projectileManager.GetPlayerBasedNadeMenu(player,tag,name));            
+            return MenuManager;
+        }
+
+        public void ShowT3Menu(CCSPlayerController player, IT3Menu menu)
+        { 
+            if (player == null) return;
+            if(!player.IsValid) return;
+            // get the manager and check of nullabilty
+            var manager = GetMenuManager();
+            if (manager == null)
+                return;
+            manager.OpenMainMenu(player, menu);
+        }
+        
+        public void ShowTagsMenu(CCSPlayerController player)
+        {
+            if (player == null) return;
+            if(!player.IsValid) return;
+
+            var tagsMenu = projectileManager.GetTagsMenu(player.SteamID);
+            ShowT3Menu(player, tagsMenu);
         }
 
 

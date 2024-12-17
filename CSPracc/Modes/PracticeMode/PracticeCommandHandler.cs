@@ -352,7 +352,7 @@ namespace CSPracc.CommandHandler
                     }                  
                     break;
                 case PRACC_COMMAND.showtags:
-                    ProjectileManager.ShowAllAvailableTags(player.SteamID);
+                    PracticeMode.ShowTagsMenu(player);
                     break;
                 case PRACC_COMMAND.find:
                     PracticeMode.ShowPlayerBasedNadeMenu(player, "", args);
