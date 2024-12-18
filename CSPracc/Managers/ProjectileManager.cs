@@ -293,6 +293,7 @@ namespace CSPracc
                 {
                     RestoreSnapshot(player, entry.Key);
                     SetLastAddedProjectileSnapshot(player.SteamID, entry.Key);
+                    manager.CloseMenu(player);
                 });
             }
 
