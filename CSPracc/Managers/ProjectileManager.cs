@@ -1393,7 +1393,7 @@ namespace CSPracc
             {
                 if (lastSnapshot.Value != null)
                 {
-                    if(snapshotContainRole(lastSnapshot.Value, strat))
+                    if(snapshotContainStrat(lastSnapshot.Value, strat))
                     {
                         Utils.ClientChatMessage($"Grenade already contains strat {strat}", player.SteamID);
                         return;
@@ -1440,7 +1440,7 @@ namespace CSPracc
                 if (lastSnapshot.Value != null)
                 {
                     bool foundStrat = false;
-                    foreach(string stratToDelete in lastSnapshot.Value.Roles)
+                    foreach(string stratToDelete in lastSnapshot.Value.Strats)
                     {
                         if(stratToDelete.ToLower() == strat.ToLower())
                         {

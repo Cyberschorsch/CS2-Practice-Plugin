@@ -392,11 +392,11 @@ namespace CSPracc.Modes
                         bool isEnabled = boolOption.OptionDisplay!.Contains("✔");
                         if (isEnabled)
                         {
-                            projectileManager.AddRoleToLastGrenade(player, strat);
+                            projectileManager.AddStratToLastGrenade(player, strat);
                         }
                         else
                         {
-                            projectileManager.RemoveRoleFromLastGrenade(player, strat);
+                            projectileManager.RemoveStratFromLastGrenade(player, strat);
                         }
                     }
                 });
