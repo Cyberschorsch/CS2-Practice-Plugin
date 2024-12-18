@@ -204,6 +204,12 @@ namespace CSPracc
             return roles.ToList();
         }
 
+        public ProjectileSnapshot GetNadeById(int id)
+        {
+            CurrentProjectileStorage.Get(id, out ProjectileSnapshot? snapshot);
+            return snapshot;
+        }
+
         public List<KeyValuePair<int,ProjectileSnapshot>> GetNades(CCSPlayerController player, Dictionary<string, object> properties)
         {
             string tag = properties.ContainsKey("tag") ? properties["tag"].ToString().ToLower() : "";
