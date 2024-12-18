@@ -281,7 +281,7 @@ namespace CSPracc.Modes
             ShowT3Menu(player, rolesMenu);
         }
 
-        public void ShowNadeWizardMenu(CCSPlayerController player)
+        public void ShowNadeWizardMenu(CCSPlayerController player, int id = 0)
         {
             // Build NadeWizard Menu:
             if (player == null) return;
@@ -291,7 +291,14 @@ namespace CSPracc.Modes
             if (manager == null)
                 return;
             var menu = manager.CreateMenu("Nade Wizard", isSubMenu: false);
-            
+
+            var current_nade = new ProjectileSnapshot();
+
+            if (id != 0)
+            {
+                current_nade = projectileManager.GetNadeById(id);
+            }
+
             // Build Tags submenu.
             var tagsmenu = manager.CreateMenu("Tags", isSubMenu: true);
             tagsmenu.ParentMenu = menu;
@@ -300,11 +307,22 @@ namespace CSPracc.Modes
 
             foreach (string tag in tags)
             {
-                tagsmenu.AddBoolOption(tag, false,  (p, option) =>
+                bool default_option_value = false;
+                default_option_value = current_nade.Tags.Contains(tag);
+                tagsmenu.AddBoolOption(tag, default_option_value,  (p, option) =>
                 {
                     if (option is IT3Option boolOption)
                     {
-                        projectileManager.AddTagToLastGrenade(player, tag);
+                        bool isEnabled = boolOption.OptionDisplay!.Contains("✔");
+                        if (isEnabled)
+                        {
+                            projectileManager.AddTagToLastGrenade(player, tag);
+                        }
+                        else
+                        {
+                            projectileManager.RemoveTagFromLastGrenade(player.SteamID, tag);
+                        }
+                            
                     }
                 });
             }
@@ -322,11 +340,22 @@ namespace CSPracc.Modes
 
             foreach (string role in roles)
             {
-                rolesmenu.AddBoolOption(role, false,  (p, option) =>
+                bool default_option_value = false;
+                default_option_value = current_nade.Roles.Contains(role);
+                
+                rolesmenu.AddBoolOption(role, default_option_value,  (p, option) =>
                 {
                     if (option is IT3Option boolOption)
                     {
-                        projectileManager.AddRoleToLastGrenade(player, role);
+                        bool isEnabled = boolOption.OptionDisplay!.Contains("✔");
+                        if (isEnabled)
+                        {
+                            projectileManager.AddRoleToLastGrenade(player, role);
+                        }
+                        else
+                        {
+                            projectileManager.RemoveRoleFromLastGrenade(player, role);
+                        }
                     }
                 });
             }

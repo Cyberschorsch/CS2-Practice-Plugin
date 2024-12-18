@@ -365,7 +365,12 @@ namespace CSPracc.CommandHandler
                     {
                         if (int.TryParse(args, out int id))
                         {
-                            ProjectileManager.SetLastAddedProjectileSnapshot(player.SteamID,id);
+                            var useNadeWizard = CSPraccPlugin.Instance.Config.UseNadeWizard;
+                            ProjectileManager.SetLastAddedProjectileSnapshot(player.SteamID, id);
+                            if (useNadeWizard)
+                            {
+                                PracticeMode.ShowNadeWizardMenu(player, id);
+                            }
                             break;
                         }
                         Utils.ClientChatMessage("Invalid parameter id", player);                       
