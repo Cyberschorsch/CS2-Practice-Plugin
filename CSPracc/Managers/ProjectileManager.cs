@@ -168,6 +168,42 @@ namespace CSPracc
             return htmlNadeMenu;
         }
 
+        public List<string> GetAllTags()
+        {
+            // Loop through all nades to get the available tags.
+            var nades = CurrentProjectileStorage.GetAll();
+            var tags = new HashSet<string>();
+
+            foreach (KeyValuePair<int, ProjectileSnapshot> nade in nades)
+            {
+                foreach (string tag in nade.Value.Tags)
+                {
+                    if (!tags.Contains(tag))
+                        tags.Add(tag);
+                }
+            }
+
+            return tags.ToList();
+        }
+        
+        public List<string> GetAllRoles()
+        {
+            // Loop through all nades to get the available tags.
+            var nades = CurrentProjectileStorage.GetAll();
+            var roles = new HashSet<string>();
+
+            foreach (KeyValuePair<int, ProjectileSnapshot> nade in nades)
+            {
+                foreach (string role in nade.Value.Roles)
+                {
+                    if (!roles.Contains(role))
+                        roles.Add(role);
+                }
+            }
+
+            return roles.ToList();
+        }
+
         public List<KeyValuePair<int,ProjectileSnapshot>> GetNades(CCSPlayerController player, Dictionary<string, object> properties)
         {
             string tag = properties.ContainsKey("tag") ? properties["tag"].ToString().ToLower() : "";
@@ -417,17 +453,17 @@ namespace CSPracc
             var tagMenu = manager.CreateMenu("Available Tags", isSubMenu: false);
             
             player.GetValueOfCookie("PersonalizedNadeMenu", out string? value);
-            List<KeyValuePair<int, ProjectileSnapshot>> taglist = new List<KeyValuePair<int, ProjectileSnapshot>>();
+            List<KeyValuePair<int, ProjectileSnapshot>> nades = new List<KeyValuePair<int, ProjectileSnapshot>>();
             if (value == null || value == "yes")
             {
-                taglist = getAllNadesFromPlayer(steamId);
+                nades = getAllNadesFromPlayer(steamId);
             }
             else
             {
-                taglist = CurrentProjectileStorage.GetAll();
+                nades = CurrentProjectileStorage.GetAll();
             }
 
-            foreach(KeyValuePair<int,ProjectileSnapshot> nade in taglist)
+            foreach(KeyValuePair<int,ProjectileSnapshot> nade in nades)
             {
                 foreach(string tag in nade.Value.Tags)
                 {

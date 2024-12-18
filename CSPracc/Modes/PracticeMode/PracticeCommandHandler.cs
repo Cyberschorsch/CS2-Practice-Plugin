@@ -110,7 +110,12 @@ namespace CSPracc.CommandHandler
                     }
                 case PRACC_COMMAND.SAVE:
                     {
-                        ProjectileManager.SaveSnapshot(player, args);
+                        var useNadeWizard = CSPraccPlugin.Instance.Config.UseNadeWizard;
+                        ProjectileManager.SaveSnapshot(player, args); 
+                        if (useNadeWizard)
+                        {
+                         PracticeMode.ShowNadeWizardMenu(player);
+                        }
                         break;
                     }
                 case PRACC_COMMAND.Delete:

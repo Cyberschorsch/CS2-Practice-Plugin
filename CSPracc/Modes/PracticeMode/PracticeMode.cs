@@ -281,6 +281,62 @@ namespace CSPracc.Modes
             ShowT3Menu(player, rolesMenu);
         }
 
+        public void ShowNadeWizardMenu(CCSPlayerController player)
+        {
+            // Build NadeWizard Menu:
+            if (player == null) return;
+            if(!player.IsValid) return;
+            // get the manager and check of nullabilty
+            var manager = GetMenuManager();
+            if (manager == null)
+                return;
+            var menu = manager.CreateMenu("Nade Wizard", isSubMenu: false);
+            
+            // Build Tags submenu.
+            var tagsmenu = manager.CreateMenu("Tags", isSubMenu: true);
+            tagsmenu.ParentMenu = menu;
+
+            List <string> tags = projectileManager.GetAllTags();
+
+            foreach (string tag in tags)
+            {
+                tagsmenu.AddBoolOption(tag, false,  (p, option) =>
+                {
+                    if (option is IT3Option boolOption)
+                    {
+                        projectileManager.AddTagToLastGrenade(player, tag);
+                    }
+                });
+            }
+            
+            menu.Add("Tags", (p, option) =>
+            {
+                manager.OpenSubMenu(player, tagsmenu);
+            });
+            
+            // Get available roles.
+            var rolesmenu = manager.CreateMenu("Roles", isSubMenu: true);
+            rolesmenu.ParentMenu = menu;
+            
+            List <string> roles = projectileManager.GetAllRoles();
+
+            foreach (string role in roles)
+            {
+                rolesmenu.AddBoolOption(role, false,  (p, option) =>
+                {
+                    if (option is IT3Option boolOption)
+                    {
+                        projectileManager.AddRoleToLastGrenade(player, role);
+                    }
+                });
+            }
+            
+            menu.Add("Roles", (p, option) =>
+            {
+                manager.OpenSubMenu(player, rolesmenu);
+            });
+            ShowT3Menu(player, menu);
+        }
 
         public void ShowCompleteNadeMenu(CCSPlayerController player)
         {

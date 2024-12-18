@@ -23,6 +23,7 @@ namespace CSPracc
         [JsonPropertyName("MapChangeDelay")] public int DelayMapChange { get; set; } = 3;
 
         [JsonPropertyName("UsePersonalNadeMenu")] public bool UsePersonalNadeMenu { get; set; } = true;
-
+        
+        [JsonPropertyName("UseNadeWizard")] public bool UseNadeWizard { get; set; } = true;
     }
 }
