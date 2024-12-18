@@ -378,18 +378,30 @@ namespace CSPracc.CommandHandler
                 case PRACC_COMMAND.editnade:
                     if (args.Length > 0)
                     {
+                        var useNadeWizard = CSPraccPlugin.Instance.Config.UseNadeWizard;
                         if (int.TryParse(args, out int id))
                         {
-                            var useNadeWizard = CSPraccPlugin.Instance.Config.UseNadeWizard;
                             ProjectileManager.SetLastAddedProjectileSnapshot(player.SteamID, id);
                             if (useNadeWizard)
                             {
                                 PracticeMode.ShowNadeWizardMenu(player, id);
                             }
+
                             break;
                         }
                         Utils.ClientChatMessage("Invalid parameter id", player);                       
-                    }                  
+                    }    
+                    else
+                    {
+                        var useNadeWizard = CSPraccPlugin.Instance.Config.UseNadeWizard;
+                        KeyValuePair<int, ProjectileSnapshot> lastSnapshot = ProjectileManager.getLastAddedProjectileSnapshot(player.SteamID);
+                        ProjectileManager.SetLastAddedProjectileSnapshot(player.SteamID, lastSnapshot.Key);
+                        if (useNadeWizard)
+                        {
+                            PracticeMode.ShowNadeWizardMenu(player, lastSnapshot.Key);
+                        }
+                        break;
+                    }
                     break;
                 case PRACC_COMMAND.showtags:
                     PracticeMode.ShowTagsMenu(player);

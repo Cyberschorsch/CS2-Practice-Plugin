@@ -639,8 +639,10 @@ namespace CSPracc
         /// </summary>
         /// <param name="steamId">player</param>
         /// <returns>snapshot</returns>
-        private KeyValuePair<int, ProjectileSnapshot> getLastAddedProjectileSnapshot(ulong steamId)
+        public KeyValuePair<int, ProjectileSnapshot> getLastAddedProjectileSnapshot(ulong steamId)
         {
+            CSPraccPlugin.Instance!.Logger.LogInformation($"steamID: {steamId}");
+            CSPraccPlugin.Instance!.Logger.LogInformation($"lastSavedNade: {lastSavedNade}");
             if(!lastSavedNade.TryGetValue(steamId,out int snapshotid))
             {
                 Server.PrintToChatAll("could not get snapshotid");
