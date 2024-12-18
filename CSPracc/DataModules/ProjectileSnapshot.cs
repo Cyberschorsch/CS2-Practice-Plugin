@@ -16,6 +16,7 @@ namespace CSPracc.DataModules
     public class ProjectileSnapshot
     {
         public List<string> Tags { get; set; } = new List<string>();
+        public List<string> Roles { get; set; } = new List<string>();
         public ulong initialThrower { get; set; } = 0;
         public GrenadeType_t GrenadeType_T { get; set; }
         public System.Numerics.Vector3 PlayerPosition { get; set; } = new Vector3(0, 0, 0);
@@ -64,6 +65,10 @@ namespace CSPracc.DataModules
             if (Tags.Count > 0)
             {
                 player.PrintToChat($"Tags: {ChatColors.Green}{String.Join(", ", Tags)}");
+            }
+            if (Roles.Count > 0)
+            {
+                player.PrintToChat($"Roles: {ChatColors.Blue}{String.Join(", ", Roles)}");
             }
         }
     }

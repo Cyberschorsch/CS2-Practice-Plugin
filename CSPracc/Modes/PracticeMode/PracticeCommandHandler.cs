@@ -283,6 +283,16 @@ namespace CSPracc.CommandHandler
                         ProjectileManager.DeleteTagFromAllNades(player.SteamID,args);
                         break;
                     }
+                case PRACC_COMMAND.ADDROLE:
+                    {
+                        ProjectileManager.AddRoleToLastGrenade(player, args);
+                        break;
+                      }
+                case PRACC_COMMAND.REMOVEROLE:
+                     {
+                        ProjectileManager.RemoveRoleFromLastGrenade(player, args);
+                        break;
+                    }
                 case PRACC_COMMAND.UpdatePos:
                     ProjectileManager.UpdatePosition(player);
                     break;

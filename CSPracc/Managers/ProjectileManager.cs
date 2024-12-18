@@ -243,6 +243,15 @@ namespace CSPracc
             }
             return false;
         }
+        
+        private bool snapshotContainRole(ProjectileSnapshot snapshot, string roleToSearch)
+        {
+            foreach(string role in snapshot.Roles)
+            {
+                if(role.ToLower() == roleToSearch.ToLower()) return true;
+            }
+            return false;
+        }
 
         /// <summary>
         /// Restoring the last thrown smoke
@@ -1158,6 +1167,52 @@ namespace CSPracc
                 CurrentProjectileStorage.SetOrAdd(kvp.Key, kvp.Value);
             }
             Utils.ClientChatMessage($"Removed tag {tag} from all your grenades", steamid);
+        }
+        
+        public void AddRoleToLastGrenade(CCSPlayerController player, string role)
+        {
+            KeyValuePair<int, ProjectileSnapshot> lastSnapshot = getLastAddedProjectileSnapshot(player.SteamID);
+            if (lastSnapshot.Key != 0)
+            {
+                if (lastSnapshot.Value != null)
+                {
+                    if(snapshotContainRole(lastSnapshot.Value, role))
+                    {
+                        Utils.ClientChatMessage($"Grenade already contains role {role}", player.SteamID);
+                        return;
+                    }
+                    lastSnapshot.Value.Roles.Add(role);
+                    CurrentProjectileStorage.SetOrAdd(lastSnapshot.Key, lastSnapshot.Value);
+                    Utils.ClientChatMessage($"Added role {role} to {lastSnapshot.Value.Title}", player.SteamID);
+                }
+            }
+        }
+
+        public void RemoveRoleFromLastGrenade(CCSPlayerController player, string role)
+        {
+            KeyValuePair<int, ProjectileSnapshot> lastSnapshot = getLastAddedProjectileSnapshot(player.SteamID);
+            if (lastSnapshot.Key != 0)
+            {
+                if (lastSnapshot.Value != null)
+                {
+                    bool foundRole = false;
+                    foreach(string roleToDelete in lastSnapshot.Value.Roles)
+                    {
+                        if(roleToDelete.ToLower() == role.ToLower())
+                        {
+                            foundRole = true;
+                            lastSnapshot.Value.Roles.Remove(roleToDelete);
+                            break;
+                        }
+                    }
+                    if(foundRole)
+                    {
+                        CurrentProjectileStorage.SetOrAdd(lastSnapshot.Key, lastSnapshot.Value);
+                        Utils.ClientChatMessage($"Removed role {role} from {lastSnapshot.Value.Title}", player.SteamID);
+                    }
+                   
+                }
+            }
         }
 
         public void ClearNades(CCSPlayerController player, bool all = false)
