@@ -71,6 +71,10 @@ namespace CSPracc.DataModules
             {
                 player.PrintToChat($"Roles: {ChatColors.Blue}{String.Join(", ", Roles)}");
             }
+            if (Strats.Count > 0)
+            {
+                player.PrintToChat($"Strats: {ChatColors.DarkRed}{String.Join(", ", Strats)}");
+            }
         }
     }
 }
