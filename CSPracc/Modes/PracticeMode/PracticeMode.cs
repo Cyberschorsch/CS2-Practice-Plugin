@@ -383,7 +383,7 @@ namespace CSPracc.Modes
             foreach (string strat in strats)
             {
                 bool default_option_value = false;
-                default_option_value = current_nade.Roles.Contains(strat);
+                default_option_value = current_nade.Strats.Contains(strat);
                 
                 stratsmenu.AddBoolOption(strat, default_option_value,  (p, option) =>
                 {
