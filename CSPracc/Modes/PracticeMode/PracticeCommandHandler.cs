@@ -303,6 +303,21 @@ namespace CSPracc.CommandHandler
                     PracticeMode.ShowRolesMenu(player);
                     break;
                 }
+                case PRACC_COMMAND.ADDSTRAT:
+                {
+                    ProjectileManager.AddStratToLastGrenade(player, args);
+                    break;
+                }
+                case PRACC_COMMAND.REMOVESTRAT:
+                {
+                    ProjectileManager.RemoveStratFromLastGrenade(player, args);
+                    break;
+                }
+                case PRACC_COMMAND.SHOWSTRAT:
+                {
+                    PracticeMode.ShowStratsMenu(player);
+                    break;
+                }
                 case PRACC_COMMAND.UpdatePos:
                     ProjectileManager.UpdatePosition(player);
                     break;

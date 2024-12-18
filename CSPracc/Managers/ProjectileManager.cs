@@ -203,6 +203,24 @@ namespace CSPracc
 
             return roles.ToList();
         }
+        
+        public List<string> GetAllStrats()
+        {
+            // Loop through all nades to get the available tags.
+            var nades = CurrentProjectileStorage.GetAll();
+            var strats = new HashSet<string>();
+
+            foreach (KeyValuePair<int, ProjectileSnapshot> nade in nades)
+            {
+                foreach (string strat in nade.Value.Strats)
+                {
+                    if (!strats.Contains(strat))
+                        strats.Add(strat);
+                }
+            }
+
+            return strats.ToList();
+        }
 
         public ProjectileSnapshot GetNadeById(int id)
         {
@@ -214,6 +232,7 @@ namespace CSPracc
         {
             string tag = properties.ContainsKey("tag") ? properties["tag"].ToString().ToLower() : "";
             string role = properties.ContainsKey("role") ? properties["role"].ToString().ToLower() : "";
+            string strat = properties.ContainsKey("strat") ? properties["strat"].ToString().ToLower() : "";
             bool usePersonalNadeMenu = (bool)properties.ContainsKey("usePersonalNadeMenu") ? (bool)properties["usePersonalNadeMenu"] : false;
             string name = properties.ContainsKey("name") ? properties["name"].ToString() : "";
             
@@ -246,6 +265,11 @@ namespace CSPracc
                     if (!snapshotContainRole(nade.Value, role) && !role.Equals(""))
                         filter = false;
                 }
+                if (!string.IsNullOrEmpty(strat))
+                {
+                    if (!snapshotContainStrat(nade.Value, strat) && !strat.Equals(""))
+                        filter = false;
+                }
 
                 if (filter)
                     nade_result.Add(nade);
@@ -264,11 +288,13 @@ namespace CSPracc
             
             string tag = properties.ContainsKey("tag") ? properties["tag"].ToString() : "";
             string role = properties.ContainsKey("role") ? properties["role"].ToString() : "";
+            string strat = properties.ContainsKey("strat") ? properties["strat"].ToString() : "";
             bool isSubMenu = (bool)properties.ContainsKey("isSubMenu") ? (bool)properties["isSubMenu"] : false;
             string name = properties.ContainsKey("name") ? properties["name"].ToString() : "";
            
             CSPraccPlugin.Instance!.Logger.LogInformation($"Tag: {tag}");
             CSPraccPlugin.Instance!.Logger.LogInformation($"Role: {role}");
+            CSPraccPlugin.Instance!.Logger.LogInformation($"Strat: {strat}");
             CSPraccPlugin.Instance!.Logger.LogInformation($"Name: {name}");
             
             player.GetValueOfCookie("PersonalizedNadeMenu", out string? value);
@@ -320,6 +346,15 @@ namespace CSPracc
             foreach(string role in snapshot.Roles)
             {
                 if(role.ToLower() == roleToSearch.ToLower()) return true;
+            }
+            return false;
+        }
+        
+        private bool snapshotContainStrat(ProjectileSnapshot snapshot, string stratToSearch)
+        {
+            foreach(string strat in snapshot.Strats)
+            {
+                if(strat.ToLower() == stratToSearch.ToLower()) return true;
             }
             return false;
         }
@@ -535,6 +570,47 @@ namespace CSPracc
             }
             
             return roleMenu;
+        }
+        
+        public IT3Menu GetStratsMenu(CCSPlayerController player)
+        {
+
+            var manager = GetMenuManager();
+            var stratMenu = manager.CreateMenu("Available Strats", isSubMenu: false);
+            
+            player.GetValueOfCookie("PersonalizedNadeMenu", out string? value);
+            List<KeyValuePair<int, ProjectileSnapshot>> nadelist = new List<KeyValuePair<int, ProjectileSnapshot>>();
+            if (value == null || value == "yes")
+            {
+                nadelist = getAllNadesFromPlayer(player.SteamID);
+            }
+            else
+            {
+                nadelist = CurrentProjectileStorage.GetAll();
+            }
+
+            foreach(KeyValuePair<int,ProjectileSnapshot> nade in nadelist)
+            {
+                foreach(string strat in nade.Value.Strats)
+                {
+                    CSPraccPlugin.Instance!.Logger.LogInformation($"Strat: {strat}");
+                    
+                    Dictionary<string, object> properties = new Dictionary<string, object>();
+                    
+                    properties["strat"] = strat;
+                    properties["isSubMenu"] = true;
+                    
+                    var submenu = GetPlayerBasedNadeMenu(player, properties);
+                    submenu.ParentMenu = stratMenu;
+                    // Build submenu for the nades.
+                    stratMenu.Add(strat, (p, option) =>
+                    {
+                        manager.OpenSubMenu(player, submenu);
+                    });
+                }
+            }
+            
+            return stratMenu;
         }
 
 
@@ -1307,6 +1383,25 @@ namespace CSPracc
                 }
             }
         }
+        
+        public void AddStratToLastGrenade(CCSPlayerController player, string strat)
+        {
+            KeyValuePair<int, ProjectileSnapshot> lastSnapshot = getLastAddedProjectileSnapshot(player.SteamID);
+            if (lastSnapshot.Key != 0)
+            {
+                if (lastSnapshot.Value != null)
+                {
+                    if(snapshotContainRole(lastSnapshot.Value, strat))
+                    {
+                        Utils.ClientChatMessage($"Grenade already contains strat {strat}", player.SteamID);
+                        return;
+                    }
+                    lastSnapshot.Value.Strats.Add(strat);
+                    CurrentProjectileStorage.SetOrAdd(lastSnapshot.Key, lastSnapshot.Value);
+                    Utils.ClientChatMessage($"Added strat {strat} to {lastSnapshot.Value.Title}", player.SteamID);
+                }
+            }
+        }
 
         public void RemoveRoleFromLastGrenade(CCSPlayerController player, string role)
         {
@@ -1329,6 +1424,33 @@ namespace CSPracc
                     {
                         CurrentProjectileStorage.SetOrAdd(lastSnapshot.Key, lastSnapshot.Value);
                         Utils.ClientChatMessage($"Removed role {role} from {lastSnapshot.Value.Title}", player.SteamID);
+                    }
+                   
+                }
+            }
+        }
+        
+        public void RemoveStratFromLastGrenade(CCSPlayerController player, string strat)
+        {
+            KeyValuePair<int, ProjectileSnapshot> lastSnapshot = getLastAddedProjectileSnapshot(player.SteamID);
+            if (lastSnapshot.Key != 0)
+            {
+                if (lastSnapshot.Value != null)
+                {
+                    bool foundStrat = false;
+                    foreach(string stratToDelete in lastSnapshot.Value.Roles)
+                    {
+                        if(stratToDelete.ToLower() == strat.ToLower())
+                        {
+                            foundStrat = true;
+                            lastSnapshot.Value.Strats.Remove(stratToDelete);
+                            break;
+                        }
+                    }
+                    if(foundStrat)
+                    {
+                        CurrentProjectileStorage.SetOrAdd(lastSnapshot.Key, lastSnapshot.Value);
+                        Utils.ClientChatMessage($"Removed strat {strat} from {lastSnapshot.Value.Title}", player.SteamID);
                     }
                    
                 }

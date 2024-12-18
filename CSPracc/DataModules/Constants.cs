@@ -159,6 +159,11 @@ namespace CSPracc.DataModules.Constants
         public const string REMOVEROLE = ".removerole";
         public const string SHOWROLES = ".showroles";
         
+        // Add strats specific commands.
+        public const string ADDSTRAT = ".addstrat";
+        public const string REMOVESTRAT = ".removestrat";
+        public const string SHOWSTRAT = ".showstrats";
+        
         
     }
 

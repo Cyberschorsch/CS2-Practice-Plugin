@@ -280,6 +280,15 @@ namespace CSPracc.Modes
             var rolesMenu = projectileManager.GetRolesMenu(player);
             ShowT3Menu(player, rolesMenu);
         }
+        
+        public void ShowStratsMenu(CCSPlayerController player)
+        {
+            if (player == null) return;
+            if(!player.IsValid) return;
+
+            var stratsMenu = projectileManager.GetStratsMenu(player);
+            ShowT3Menu(player, stratsMenu);
+        }
 
         public void ShowNadeWizardMenu(CCSPlayerController player, int id = 0)
         {
@@ -364,6 +373,41 @@ namespace CSPracc.Modes
             {
                 manager.OpenSubMenu(player, rolesmenu);
             });
+            
+            // Get available Strats.
+            var stratsmenu = manager.CreateMenu("Strats", isSubMenu: true);
+            stratsmenu.ParentMenu = menu;
+            
+            List <string> strats = projectileManager.GetAllStrats();
+
+            foreach (string strat in strats)
+            {
+                bool default_option_value = false;
+                default_option_value = current_nade.Roles.Contains(strat);
+                
+                stratsmenu.AddBoolOption(strat, default_option_value,  (p, option) =>
+                {
+                    if (option is IT3Option boolOption)
+                    {
+                        bool isEnabled = boolOption.OptionDisplay!.Contains("✔");
+                        if (isEnabled)
+                        {
+                            projectileManager.AddRoleToLastGrenade(player, strat);
+                        }
+                        else
+                        {
+                            projectileManager.RemoveRoleFromLastGrenade(player, strat);
+                        }
+                    }
+                });
+            }
+            
+            menu.Add("Strats", (p, option) =>
+            {
+                manager.OpenSubMenu(player, stratsmenu);
+            });
+            
+            
             ShowT3Menu(player, menu);
         }
 
