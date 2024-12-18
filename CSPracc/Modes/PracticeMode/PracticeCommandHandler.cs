@@ -293,6 +293,11 @@ namespace CSPracc.CommandHandler
                         ProjectileManager.RemoveRoleFromLastGrenade(player, args);
                         break;
                     }
+                case PRACC_COMMAND.SHOWROLES:
+                {
+                    PracticeMode.ShowRolesMenu(player);
+                    break;
+                }
                 case PRACC_COMMAND.UpdatePos:
                     ProjectileManager.UpdatePosition(player);
                     break;

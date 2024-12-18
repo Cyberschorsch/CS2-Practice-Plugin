@@ -168,10 +168,13 @@ namespace CSPracc
             return htmlNadeMenu;
         }
 
-        public List<KeyValuePair<int,ProjectileSnapshot>> GetNades(CCSPlayerController player, string tag, string name = "", bool usePersonalNadeMenu = false)
+        public List<KeyValuePair<int,ProjectileSnapshot>> GetNades(CCSPlayerController player, Dictionary<string, object> properties)
         {
-            CSPraccPlugin.Instance!.Logger.LogInformation("Show nade menu with tag");
-            tag = tag.ToLower();
+            string tag = properties.ContainsKey("tag") ? properties["tag"].ToString().ToLower() : "";
+            string role = properties.ContainsKey("role") ? properties["role"].ToString().ToLower() : "";
+            bool usePersonalNadeMenu = (bool)properties.ContainsKey("usePersonalNadeMenu") ? (bool)properties["usePersonalNadeMenu"] : false;
+            string name = properties.ContainsKey("name") ? properties["name"].ToString() : "";
+            
             List<KeyValuePair<int,ProjectileSnapshot>> nade_result = new List<KeyValuePair<int, ProjectileSnapshot>>();
             List<KeyValuePair<int,ProjectileSnapshot>> nades = new List<KeyValuePair<int, ProjectileSnapshot>>();
             if (usePersonalNadeMenu)
@@ -182,12 +185,28 @@ namespace CSPracc
             {
                 nades = CurrentProjectileStorage.GetAll();
             }
-            foreach (KeyValuePair<int, ProjectileSnapshot> entry in nades)
+            
+            // Filter available nades by tag, role and name.
+            foreach (KeyValuePair<int, ProjectileSnapshot> nade in nades)
             {
-                if (snapshotContainTag(entry.Value,tag) || tag == "" || entry.Value.Title.Contains(tag) && entry.Value.Title.Contains(name))
+                bool filter = true;
+
+                if (!string.IsNullOrEmpty(name))
+                    if (!nade.Value.Title.Contains(name))
+                        filter = false;
+                if (!string.IsNullOrEmpty(tag))
                 {
-                    nade_result.Add(entry);
+                    if (!snapshotContainTag(nade.Value, tag) && !tag.Equals(""))
+                        filter = false;
                 }
+                if (!string.IsNullOrEmpty(role))
+                {
+                    if (!snapshotContainRole(nade.Value, role) && !role.Equals(""))
+                        filter = false;
+                }
+
+                if (filter)
+                    nade_result.Add(nade);
             }
             
             return nade_result;
@@ -198,12 +217,24 @@ namespace CSPracc
         /// </summary>
         /// <param name="player">player who called the nade menu</param>
         /// <returns></returns>
-        public IT3Menu GetPlayerBasedNadeMenu(CCSPlayerController player, string tag, string name = "", bool isSubMenu = false)
+        public IT3Menu GetPlayerBasedNadeMenu(CCSPlayerController player, Dictionary<string, object> properties)
         {
+            
+            string tag = properties.ContainsKey("tag") ? properties["tag"].ToString() : "";
+            string role = properties.ContainsKey("role") ? properties["role"].ToString() : "";
+            bool isSubMenu = (bool)properties.ContainsKey("isSubMenu") ? (bool)properties["isSubMenu"] : false;
+            string name = properties.ContainsKey("name") ? properties["name"].ToString() : "";
+           
+            CSPraccPlugin.Instance!.Logger.LogInformation($"Tag: {tag}");
+            CSPraccPlugin.Instance!.Logger.LogInformation($"Role: {role}");
+            CSPraccPlugin.Instance!.Logger.LogInformation($"Name: {name}");
+            
             player.GetValueOfCookie("PersonalizedNadeMenu", out string? value);
             
             bool usePersonalNadeMenu = (value == "yes") || (value == null && CSPraccPlugin.Instance!.Config!.UsePersonalNadeMenu) ? true : false;
-            List<KeyValuePair<int,ProjectileSnapshot>> nades = GetNades(player, tag, name, usePersonalNadeMenu);
+            
+            // Get list of nades filtered by the arguments.
+            List<KeyValuePair<int,ProjectileSnapshot>> nades = GetNades(player, properties);
 
             string MenuTitle = string.Empty;
             var manager = GetMenuManager();
@@ -222,14 +253,11 @@ namespace CSPracc
             
             foreach (KeyValuePair<int, ProjectileSnapshot> entry in nades)
             {
-                if (snapshotContainTag(entry.Value,tag) || tag == "" || entry.Value.Title.Contains(tag) && entry.Value.Title.Contains(name))
+                Menu.Add(entry.Value.Title, (p, option) =>
                 {
-                    Menu.Add(entry.Value.Title, (p, option) =>
-                    {
-                        RestoreSnapshot(player, entry.Key);
-                        SetLastAddedProjectileSnapshot(player.SteamID, entry.Key);
-                    });
-                }
+                    RestoreSnapshot(player, entry.Key);
+                    SetLastAddedProjectileSnapshot(player.SteamID, entry.Key);
+                });
             }
 
             return Menu;
@@ -239,7 +267,7 @@ namespace CSPracc
         {
             foreach(string tag in snapshot.Tags)
             {
-                if(tag.ToLower() ==tagToSearch.ToLower()) return true;
+                if(tag.ToLower() == tagToSearch.ToLower()) return true;
             }
             return false;
         }
@@ -404,7 +432,11 @@ namespace CSPracc
                 foreach(string tag in nade.Value.Tags)
                 {
                     CSPraccPlugin.Instance!.Logger.LogInformation($"Tag: {tag}");
-                    var submenu = GetPlayerBasedNadeMenu(player, tag, "", true);
+                    Dictionary<string, object> properties = new Dictionary<string, object>();
+                    properties["tag"] = tag;
+                    properties["isSubMenu"] = true;
+                    
+                    var submenu = GetPlayerBasedNadeMenu(player, properties);
                     submenu.ParentMenu = tagMenu;
                     // Build submenu for the nades.
                     tagMenu.Add(tag, (p, option) =>
@@ -415,6 +447,51 @@ namespace CSPracc
             }
             
             return tagMenu;
+        }
+        
+        public IT3Menu GetRolesMenu(CCSPlayerController player)
+        {
+
+            List<string> roles = new List<string>();
+            
+            List<KeyValuePair<string, Action>> rolesOptions = new List<KeyValuePair<string, Action>>();
+
+            var manager = GetMenuManager();
+            var roleMenu = manager.CreateMenu("Available Roles", isSubMenu: false);
+            
+            player.GetValueOfCookie("PersonalizedNadeMenu", out string? value);
+            List<KeyValuePair<int, ProjectileSnapshot>> nadelist = new List<KeyValuePair<int, ProjectileSnapshot>>();
+            if (value == null || value == "yes")
+            {
+                nadelist = getAllNadesFromPlayer(player.SteamID);
+            }
+            else
+            {
+                nadelist = CurrentProjectileStorage.GetAll();
+            }
+
+            foreach(KeyValuePair<int,ProjectileSnapshot> nade in nadelist)
+            {
+                foreach(string role in nade.Value.Roles)
+                {
+                    CSPraccPlugin.Instance!.Logger.LogInformation($"Role: {role}");
+                    
+                    Dictionary<string, object> properties = new Dictionary<string, object>();
+                    
+                    properties["role"] = role;
+                    properties["isSubMenu"] = true;
+                    
+                    var submenu = GetPlayerBasedNadeMenu(player, properties);
+                    submenu.ParentMenu = roleMenu;
+                    // Build submenu for the nades.
+                    roleMenu.Add(role, (p, option) =>
+                    {
+                        manager.OpenSubMenu(player, submenu);
+                    });
+                }
+            }
+            
+            return roleMenu;
         }
 
 

@@ -157,6 +157,7 @@ namespace CSPracc.DataModules.Constants
         // Add gameplay role specific commands.
         public const string ADDROLE = ".addrole";
         public const string REMOVEROLE = ".removerole";
+        public const string SHOWROLES = ".showroles";
         
         
     }

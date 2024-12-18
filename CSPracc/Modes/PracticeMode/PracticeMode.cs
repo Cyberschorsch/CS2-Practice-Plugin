@@ -236,7 +236,11 @@ namespace CSPracc.Modes
         {
             if (player == null) return;
             if(!player.IsValid) return;
-            ShowT3Menu(player, projectileManager.GetPlayerBasedNadeMenu(player,tag,name));
+            
+            Dictionary<string, object> properties = new Dictionary<string, object>();
+            properties["tag"] = tag;
+            properties["name"] = name;
+            ShowT3Menu(player, projectileManager.GetPlayerBasedNadeMenu(player, properties));
         }
         
         // get the instance
@@ -266,6 +270,15 @@ namespace CSPracc.Modes
 
             var tagsMenu = projectileManager.GetTagsMenu(player.SteamID);
             ShowT3Menu(player, tagsMenu);
+        }
+        
+        public void ShowRolesMenu(CCSPlayerController player)
+        {
+            if (player == null) return;
+            if(!player.IsValid) return;
+
+            var rolesMenu = projectileManager.GetRolesMenu(player);
+            ShowT3Menu(player, rolesMenu);
         }
 
 
