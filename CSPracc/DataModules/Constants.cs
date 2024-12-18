@@ -153,6 +153,13 @@ namespace CSPracc.DataModules.Constants
         public const string store_replay = ".storereplay";
         public const string rename_replayset = ".renameset";
         public const string replay_menu = ".replays";
+        
+        // Add gameplay role specific commands.
+        public const string ADDROLE = ".addrole";
+        public const string REMOVEROLE = ".removerole";
+        public const string SHOWROLES = ".showroles";
+        
+        
     }
 
     public class AdminFlags
