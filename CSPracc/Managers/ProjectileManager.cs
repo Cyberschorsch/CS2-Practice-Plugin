@@ -1,4 +1,4 @@
-﻿using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Capabilities;
 using CounterStrikeSharp.API.Modules.Menu;
 using CounterStrikeSharp.API;
@@ -774,6 +774,12 @@ namespace CSPracc
                 return;
             }
             snapshotToAdd.Title = name;
+            
+            var team = player.Team;
+            CSPraccPlugin.Instance!.Logger.LogInformation($"Team: {team.ToString()}");
+            
+            snapshotToAdd.Team = team;
+            
             int newid = CurrentProjectileStorage.Add(snapshotToAdd);
             lastSavedNade.SetOrAdd(player.SteamID, newid);        
             player.ChatMessage($"Successfully added grenade {ChatColors.Blue}\"{name}\"{ChatColors.White} at id: {ChatColors.Green}{newid}");

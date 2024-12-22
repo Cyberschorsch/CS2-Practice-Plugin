@@ -18,6 +18,9 @@ namespace CSPracc.DataModules
         public List<string> Tags { get; set; } = new List<string>();
         public List<string> Roles { get; set; } = new List<string>();
         public List<string> Strats { get; set; } = new List<string>();
+        
+        public CsTeam Team { get; set; } = new CsTeam();
+        
         public ulong initialThrower { get; set; } = 0;
         public GrenadeType_t GrenadeType_T { get; set; }
         public System.Numerics.Vector3 PlayerPosition { get; set; } = new Vector3(0, 0, 0);
