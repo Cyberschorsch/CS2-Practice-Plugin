@@ -474,7 +474,7 @@ namespace CSPracc.CommandHandler
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.worstspawn}{ChatColors.White} Go to the worst spawn of your position.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.NADES}{ChatColors.White}{ChatColors.Blue} [id]{ChatColors.White}. If id is passed an available. Teleport to given nade lineup. Else open nade menu.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.find}{ChatColors.White}{ChatColors.Red} 'name'{ChatColors.White}. Open nade menu containing nades which contain the given keyword.");
-            message.Add($" {ChatColors.Green}{PRACC_COMMAND.SAVE}{ChatColors.White}{ChatColors.Red} 'name'{ChatColors.White}. Saves current lineup.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.SAVE}{ChatColors.White}{ChatColors.Red} 'name,description'{ChatColors.White}. Saves current lineup. Description is optional.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.settings}{ChatColors.White} Switch between global or personalized nade menu.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.Last}{ChatColors.White} Goto last thrown grenade position.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.BACK}{ChatColors.White}{ChatColors.Blue} [number]{ChatColors.White} Go back in your grenade history, can give a number on how many positions.");
@@ -515,6 +515,12 @@ namespace CSPracc.CommandHandler
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.store_replay}{ChatColors.White} Save the last recording permanently.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.rename_replayset}{ChatColors.White}{ChatColors.Red} 'new name'{ChatColors.White} Rename the current replay set.");
             message.Add($" {ChatColors.Green}{PRACC_COMMAND.replay_menu}{ChatColors.White} Open menu with all replays.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.ADDROLE}{ChatColors.White}{ChatColors.Red} 'name'{ChatColors.White}. Add a gameplay role to the nade. Creates a new role is the role does not exist.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.ADDROLE}{ChatColors.White}{ChatColors.Red} 'name'{ChatColors.White}. Remove a gameplay role from the nade.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.SHOWROLES}{ChatColors.White} Show all available gameplay roles.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.ADDSTRAT}{ChatColors.White}{ChatColors.Red} 'name'{ChatColors.White}. Add a strat to the nade. Creates a new strat is the strat does not exist.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.REMOVESTRAT}{ChatColors.White}{ChatColors.Red} 'name'{ChatColors.White}. Remove a strat from the nade.");
+            message.Add($" {ChatColors.Green}{PRACC_COMMAND.SHOWSTRAT}{ChatColors.White} Show all available strats.");
 
             foreach (string s in message)
             {
