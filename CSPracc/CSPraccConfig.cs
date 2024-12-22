@@ -25,5 +25,7 @@ namespace CSPracc
         [JsonPropertyName("UsePersonalNadeMenu")] public bool UsePersonalNadeMenu { get; set; } = true;
         
         [JsonPropertyName("UseNadeWizard")] public bool UseNadeWizard { get; set; } = true;
+        
+        [JsonPropertyName("FilterByTeam")] public bool FilterByTeam { get; set; } = true;
     }
 }

@@ -233,6 +233,9 @@ namespace CSPracc
             string role = properties.ContainsKey("role") ? properties["role"].ToString().ToLower() : "";
             string strat = properties.ContainsKey("strat") ? properties["strat"].ToString().ToLower() : "";
             bool usePersonalNadeMenu = (bool)properties.ContainsKey("usePersonalNadeMenu") ? (bool)properties["usePersonalNadeMenu"] : false;
+            
+            bool FilterByTeam = CSPraccPlugin.Instance.Config.FilterByTeam;
+            CSPraccPlugin.Instance!.Logger.LogInformation($"Filter by Team?: {FilterByTeam}");
             string name = properties.ContainsKey("name") ? properties["name"].ToString() : "";
             
             List<KeyValuePair<int,ProjectileSnapshot>> nade_result = new List<KeyValuePair<int, ProjectileSnapshot>>();
@@ -246,10 +249,27 @@ namespace CSPracc
                 nades = CurrentProjectileStorage.GetAll();
             }
             
-            // Filter available nades by tag, role and name.
+            // Filter available nades by tag, role, name and team.
             foreach (KeyValuePair<int, ProjectileSnapshot> nade in nades)
             {
                 bool filter = true;
+                
+                if (FilterByTeam)
+                {
+                    CsTeam currentTeam = player.Team;
+                    CsTeam nadeTeam = nade.Value.Team;
+                    CSPraccPlugin.Instance!.Logger.LogInformation($"Nade: {nade.Value.Title} Current team / Nade Team: {currentTeam} /  {nadeTeam}");
+                    if (currentTeam == nadeTeam)
+                    {
+                        CSPraccPlugin.Instance!.Logger.LogInformation($"Nade is for the current team.");
+                    }
+                    else
+                    {
+                        CSPraccPlugin.Instance!.Logger.LogInformation($"Nade is not for the current team of the player, filtering out.");
+                        continue;
+                    }
+                        
+                }
 
                 if (!string.IsNullOrEmpty(name))
                     if (!nade.Value.Title.Contains(name))
@@ -494,15 +514,14 @@ namespace CSPracc
             var tagMenu = manager.CreateMenu("Available Tags", isSubMenu: false);
             
             player.GetValueOfCookie("PersonalizedNadeMenu", out string? value);
+            
+            bool usePersonalNadeMenu = (value == "yes") || (value == null && CSPraccPlugin.Instance!.Config!.UsePersonalNadeMenu) ? true : false;
             List<KeyValuePair<int, ProjectileSnapshot>> nades = new List<KeyValuePair<int, ProjectileSnapshot>>();
-            if (value == null || value == "yes")
-            {
-                nades = getAllNadesFromPlayer(steamId);
-            }
-            else
-            {
-                nades = CurrentProjectileStorage.GetAll();
-            }
+            
+            Dictionary<string, object> getNadesProperties = new Dictionary<string, object>();
+            getNadesProperties["usePersonalNadeMenu"] = usePersonalNadeMenu;
+            
+            nades = GetNades(player, getNadesProperties);
 
             foreach(KeyValuePair<int,ProjectileSnapshot> nade in nades)
             {

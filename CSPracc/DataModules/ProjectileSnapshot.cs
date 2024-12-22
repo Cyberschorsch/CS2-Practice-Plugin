@@ -78,6 +78,7 @@ namespace CSPracc.DataModules
             {
                 player.PrintToChat($"Strats: {ChatColors.DarkRed}{String.Join(", ", Strats)}");
             }
+            player.PrintToChat($"Team: {ChatColors.Green}{Team.ToString()}");
         }
     }
 }
