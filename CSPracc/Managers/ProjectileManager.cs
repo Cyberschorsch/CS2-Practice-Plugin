@@ -236,6 +236,10 @@ namespace CSPracc
             
             bool FilterByTeam = CSPraccPlugin.Instance.Config.FilterByTeam;
             CSPraccPlugin.Instance!.Logger.LogInformation($"Filter by Team?: {FilterByTeam}");
+            
+            bool AlwaysShowNadesWithoutTeam = CSPraccPlugin.Instance.Config.AlwaysShowNadesWithoutTeam;
+            CSPraccPlugin.Instance!.Logger.LogInformation($"Always Show Nades without Team?: {AlwaysShowNadesWithoutTeam}");
+            
             string name = properties.ContainsKey("name") ? properties["name"].ToString() : "";
             
             List<KeyValuePair<int,ProjectileSnapshot>> nade_result = new List<KeyValuePair<int, ProjectileSnapshot>>();
@@ -258,17 +262,23 @@ namespace CSPracc
                 {
                     CsTeam currentTeam = player.Team;
                     CsTeam nadeTeam = nade.Value.Team;
-                    CSPraccPlugin.Instance!.Logger.LogInformation($"Nade: {nade.Value.Title} Current team / Nade Team: {currentTeam} /  {nadeTeam}");
-                    if (currentTeam == nadeTeam)
+                    if (nadeTeam == CsTeam.None && AlwaysShowNadesWithoutTeam)
                     {
-                        CSPraccPlugin.Instance!.Logger.LogInformation($"Nade is for the current team.");
+                        CSPraccPlugin.Instance!.Logger.LogInformation($"Nade is not assigned to a team but config is set to show the nade.");
                     }
                     else
                     {
-                        CSPraccPlugin.Instance!.Logger.LogInformation($"Nade is not for the current team of the player, filtering out.");
-                        continue;
+                        CSPraccPlugin.Instance!.Logger.LogInformation($"Nade: {nade.Value.Title} Current team / Nade Team: {currentTeam} /  {nadeTeam}");
+                        if (currentTeam == nadeTeam)
+                        {
+                            CSPraccPlugin.Instance!.Logger.LogInformation($"Nade is for the current team.");
+                        }
+                        else
+                        {
+                            CSPraccPlugin.Instance!.Logger.LogInformation($"Nade is not for the current team of the player, filtering out.");
+                            continue;
+                        }
                     }
-                        
                 }
 
                 if (!string.IsNullOrEmpty(name))

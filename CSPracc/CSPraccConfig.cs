@@ -27,5 +27,6 @@ namespace CSPracc
         [JsonPropertyName("UseNadeWizard")] public bool UseNadeWizard { get; set; } = true;
         
         [JsonPropertyName("FilterByTeam")] public bool FilterByTeam { get; set; } = true;
+        [JsonPropertyName("AlwaysShowNadesWithoutTeam")] public bool AlwaysShowNadesWithoutTeam { get; set; } = true;
     }
 }
