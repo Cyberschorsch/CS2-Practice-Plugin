@@ -196,8 +196,7 @@ namespace CSPracc
             {
                 foreach (string role in nade.Value.Roles)
                 {
-                    if (!roles.Contains(role))
-                        roles.Add(role);
+                    roles.Add(role);
                 }
             }
 
@@ -555,17 +554,21 @@ namespace CSPracc
                     CSPraccPlugin.Instance!.Logger.LogInformation($"Role: {role}");
                     
                     Dictionary<string, object> properties = new Dictionary<string, object>();
-                    
-                    properties["role"] = role;
-                    properties["isSubMenu"] = true;
-                    
-                    var submenu = GetPlayerBasedNadeMenu(player, properties);
-                    submenu.ParentMenu = roleMenu;
-                    // Build submenu for the nades.
-                    roleMenu.Add(role, (p, option) =>
+                    if (!roles.Contains(role))
                     {
-                        manager.OpenSubMenu(player, submenu);
-                    });
+                        properties["role"] = role;
+                        properties["isSubMenu"] = true;
+                    
+                        var submenu = GetPlayerBasedNadeMenu(player, properties);
+                        submenu.ParentMenu = roleMenu;
+                        // Build submenu for the nades.
+                        roleMenu.Add(role, (p, option) =>
+                        {
+                            manager.OpenSubMenu(player, submenu);
+                        });    
+                        roles.Add(role);
+                    }
+                    
                 }
             }
             
@@ -574,6 +577,8 @@ namespace CSPracc
         
         public IT3Menu GetStratsMenu(CCSPlayerController player)
         {
+            List<string> strats = new List<string>();
+            
 
             var manager = GetMenuManager();
             var stratMenu = manager.CreateMenu("Available Strats", isSubMenu: false);
@@ -596,17 +601,22 @@ namespace CSPracc
                     CSPraccPlugin.Instance!.Logger.LogInformation($"Strat: {strat}");
                     
                     Dictionary<string, object> properties = new Dictionary<string, object>();
-                    
-                    properties["strat"] = strat;
-                    properties["isSubMenu"] = true;
-                    
-                    var submenu = GetPlayerBasedNadeMenu(player, properties);
-                    submenu.ParentMenu = stratMenu;
-                    // Build submenu for the nades.
-                    stratMenu.Add(strat, (p, option) =>
+                    if (!strats.Contains(strat))
                     {
-                        manager.OpenSubMenu(player, submenu);
-                    });
+                        properties["strat"] = strat;
+                        properties["isSubMenu"] = true;
+                    
+                        var submenu = GetPlayerBasedNadeMenu(player, properties);
+                        submenu.ParentMenu = stratMenu;
+                        // Build submenu for the nades.
+                        stratMenu.Add(strat, (p, option) =>
+                        {
+                            manager.OpenSubMenu(player, submenu);
+                        });
+                        strats.Add(strat);
+                    }
+                    
+                    
                 }
             }
             
@@ -743,7 +753,19 @@ namespace CSPracc
             //TODO provide actual projectile Position
             CounterStrikeSharp.API.Modules.Utils.Vector projectilePosition = new CounterStrikeSharp.API.Modules.Utils.Vector();
             QAngle playerAngle = player.PlayerPawn.Value.EyeAngles;
-            string name = args;
+            string name;
+            
+            var parts = args.Split(',');
+            if (parts.Length == 1)
+                name = parts[0].Trim();
+            else
+                name = parts[0].Trim();
+
+            string description;
+            if (parts.Length > 1)
+                description = parts[1].Trim() ?? "";
+            else
+                description = "";
 
             ProjectileSnapshot? snapshotToAdd = getLatestProjectileSnapshot(player.SteamID);
             if(snapshotToAdd == null)
@@ -755,6 +777,8 @@ namespace CSPracc
             int newid = CurrentProjectileStorage.Add(snapshotToAdd);
             lastSavedNade.SetOrAdd(player.SteamID, newid);        
             player.ChatMessage($"Successfully added grenade {ChatColors.Blue}\"{name}\"{ChatColors.White} at id: {ChatColors.Green}{newid}");
+            if (description != String.Empty)
+                AddDescription(player.SteamID, description);
         }
         
         /// <summary>
