@@ -10,6 +10,7 @@ using CSPracc.Managers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -25,6 +26,32 @@ namespace CSPracc
             }
             return AdminManager.PlayerHasPermissions(playerController, AdminFlags.Standard);
         }
+
+        public static bool canStartPracticeMode(this CCSPlayerController playerController)
+        {   
+            if (playerController.IsAdmin())
+                return true;
+            
+            if(!CSPraccPlugin.Instance!.Config!.AdminRequirement)
+            {
+                return true;
+            }
+            return AdminManager.PlayerHasPermissions(playerController, AdminFlags.PracticeMode);
+        }
+        
+        public static bool canChangeMap(this CCSPlayerController playerController)
+        {   
+            if (playerController.IsAdmin())
+                return true;
+            
+            if(!CSPraccPlugin.Instance!.Config!.AdminRequirement)
+            {
+                return true;
+            }
+            return AdminManager.PlayerHasPermissions(playerController, AdminFlags.Map);
+        }
+        
+        
 
         public static CsTeam GetCsTeam(this CCSPlayerController playerController)
         {

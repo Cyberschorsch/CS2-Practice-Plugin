@@ -177,9 +177,9 @@ namespace CSPracc.CommandHandler
                     }
                 case BASE_COMMAND.PRACC:
                     {
-                        if (!player.IsAdmin())
+                        if (!player.canStartPracticeMode())
                         {
-                            player.PrintToCenter("Only admins can execute this command!");
+                            player.PrintToCenter("Only admins or players with practice permission can execute this command!");
                             return false;
                         }
                         CSPraccPlugin.SwitchMode(Enums.PluginMode.Pracc);

@@ -45,7 +45,7 @@ namespace CSPracc.Modes
         {
             if (player == null) return;
             if (!player.PlayerPawn.IsValid) { return; }
-            if (!player.IsAdmin()) { player.PrintToCenter("Only admins can execute this command!"); return; }
+            if (!player.canChangeMap()) { player.PrintToCenter("Only admins or players with map permission can execute this command!"); return; }
             if (mapName == null) return;
             if (mapName.Length == 0) return;
             if (!mapName.StartsWith("de_"))

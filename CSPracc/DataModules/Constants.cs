@@ -170,7 +170,10 @@ namespace CSPracc.DataModules.Constants
     public class AdminFlags
     {
         public const string Standard = "@CSPracc/admin";
+        public const string PracticeMode = "@CSPracc/practice";
+        public const string Map = "@CSPracc/map";
     }
+    
     public class Methods
     {
         public static void MsgToServer(string msg)
