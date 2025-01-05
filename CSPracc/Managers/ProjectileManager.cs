@@ -1463,6 +1463,20 @@ namespace CSPracc
                 }
             }
         }
+        
+        public void SetTeamToLastGrenade(CCSPlayerController player, CsTeam team)
+        {
+            KeyValuePair<int, ProjectileSnapshot> lastSnapshot = getLastAddedProjectileSnapshot(player.SteamID);
+            if (lastSnapshot.Key != 0)
+            {
+                if (lastSnapshot.Value != null)
+                {
+                    lastSnapshot.Value.Team = team;
+                    CurrentProjectileStorage.SetOrAdd(lastSnapshot.Key, lastSnapshot.Value);
+                    Utils.ClientChatMessage($"Set team {team.ToString()} to {lastSnapshot.Value.Title}", player.SteamID);
+                }
+            }
+        }
 
         public void RemoveRoleFromLastGrenade(CCSPlayerController player, string role)
         {

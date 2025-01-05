@@ -114,7 +114,7 @@ namespace CSPracc.CommandHandler
                         ProjectileManager.SaveSnapshot(player, args); 
                         if (useNadeWizard)
                         {
-                         PracticeMode.ShowNadeWizardMenu(player);
+                         PracticeMode.ShowNadeWizardMenu(player, ProjectileManager.getLastAddedProjectileSnapshot(player.SteamID).Key);
                         }
                         break;
                     }

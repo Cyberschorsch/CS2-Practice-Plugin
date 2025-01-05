@@ -407,6 +407,32 @@ namespace CSPracc.Modes
                 manager.OpenSubMenu(player, stratsmenu);
             });
             
+            // Add option to set or change the team.
+            var teammenu = manager.CreateMenu("Team", isSubMenu: true);
+            teammenu.ParentMenu = menu;
+            List<CsTeam> teams = Enum.GetValues(typeof(CsTeam)).Cast<CsTeam>().ToList();
+            
+            foreach (CsTeam team in teams)
+            {
+                bool default_option_value = current_nade.Team == team;
+                
+                var option_name = team.ToString();
+                
+                if (default_option_value)
+                    option_name += " ✔";
+    
+                teammenu.Add(option_name, (p, option) =>
+                {   
+                    projectileManager.SetTeamToLastGrenade(player, team);
+                    manager.CloseMenu(player);
+                    ShowNadeWizardMenu(player, id);
+                });
+            }
+
+            menu.Add("Teams", (p, option) =>
+            {
+                manager.OpenSubMenu(player, teammenu);
+            });
             
             ShowT3Menu(player, menu);
         }
