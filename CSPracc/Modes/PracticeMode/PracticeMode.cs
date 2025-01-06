@@ -29,44 +29,40 @@ namespace CSPracc.Modes
         /// </summary>
         /// <param name="ccsplayerController">player who issued the command</param>
         /// <returns>return setting menu</returns>
-        public HtmlMenu GetPracticeSettingsMenu(CCSPlayerController ccsplayerController)
+        public IT3Menu GetPracticeSettingsMenu(CCSPlayerController ccsplayerController)
         {
-            HtmlMenu practiceMenu;
-            List<KeyValuePair<string,Action>> menuOptions = new List<KeyValuePair<string,Action>>();
-            if(!ccsplayerController.GetValueOfCookie("PersonalizedNadeMenu",out string? setting))
-            {
-                if(CSPraccPlugin.Instance.Config.UsePersonalNadeMenu)
-                {
-                    setting = "yes";
-                    ccsplayerController.SetOrAddValueOfCookie("PersonalizedNadeMenu", "yes");
-                }
-                else
-                {
-                    setting = "no";
-                    ccsplayerController.SetOrAddValueOfCookie("PersonalizedNadeMenu", "no");
-                }                
-            }
-            if(setting == null)
-            {
-                setting = CSPraccPlugin.Instance.Config.UsePersonalNadeMenu ? "yes": "no";
-                ccsplayerController.SetOrAddValueOfCookie("PersonalizedNadeMenu", "yes");
-            }
-            string MenuText = "";
-            if (setting == "yes")
-            {
-                MenuText = "Show Global Nade Menu";
-            }
-            else
-            {
-                MenuText = "Show Personalized Nade Menu";
-            }
+            var manager = GetMenuManager();
+            var menu = manager.CreateMenu("Practice Mode Settings", isSubMenu: false);
 
-            KeyValuePair<string, Action> personalizedNadeMenu = new KeyValuePair<string, Action>(MenuText, () =>
-            {
-                SwitchPersonalizedNadeMenuOption(ccsplayerController);
-            });
-            menuOptions.Add(personalizedNadeMenu);
-            return practiceMenu = new HtmlMenu("Practice Settings",menuOptions);
+            // Build Menu and Submenus.
+            
+            // Show Personalized Nade Menu instead of Global?
+            ccsplayerController.GetValueOfCookie("PersonalizedNadeMenu", out string? setting);
+            bool default_option_value = false;
+            
+            if (setting == "yes")
+                default_option_value = true;
+            
+
+            menu.AddBoolOption("Only show personal nades", default_option_value, (p, option) =>
+                {
+                    if (option is IT3Option boolOption)
+                    {
+                        bool isEnabled = boolOption.OptionDisplay!.Contains("✔");
+                        if (isEnabled)
+                        {
+                            ccsplayerController.SetOrAddValueOfCookie("PersonalizedNadeMenu", "yes");
+                        }
+                        else
+                        {
+                            ccsplayerController.SetOrAddValueOfCookie("PersonalizedNadeMenu", "no");
+                        }
+                    }
+                    
+                    
+                });
+
+            return menu;
         }
 
         /// <summary>
@@ -460,7 +456,7 @@ namespace CSPracc.Modes
         {
             if (player == null) return;
             if (!player.IsValid) return;
-            GuiManager.AddMenu(player.SteamID,GetPracticeSettingsMenu(player));
+            ShowT3Menu(player, GetPracticeSettingsMenu(player));
         }
 
         public void Record(CCSPlayerController playerController,string name = "")
