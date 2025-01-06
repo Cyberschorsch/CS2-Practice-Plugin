@@ -65,33 +65,38 @@ namespace CSPracc.DataStorages.JsonStorages
 
         public bool SetOrAddValueOfCookie(ulong userId, string cookieName, string cookieValue)
         {
-            if(userId == 0 || cookieName == "" || cookieValue == "")
+            if (userId == 0 || string.IsNullOrEmpty(cookieName) || string.IsNullOrEmpty(cookieValue))
             {
                 return false;
             }
             if (!Storage.TryGetValue(userId, out Dictionary<string, string>? userCookies))
             {
-                Dictionary<string, string> userCookieDict = new Dictionary<string, string>();
+                var userCookieDict = new Dictionary<string, string>();
                 userCookieDict.Add(cookieName, cookieValue);
-                if (!Storage.ContainsKey(userId))
-                {                   
-                    Storage.Add(userId, userCookieDict);
-                }
-                Storage[userId] = userCookieDict;
+                Storage.Add(userId, userCookieDict);
             }
             else
             {
-                if (userCookies == null)
-                {
-                    userCookies = new Dictionary<string, string>();
-                }
+                userCookies = new Dictionary<string, string>(userCookies); // Clone the existing dictionary to avoid null reference
                 if (userCookies.ContainsKey(cookieName))
                 {
                     userCookies[cookieName] = cookieValue;
                 }
-                Storage[userId] = userCookies;
+                else
+                {
+                    userCookies.Add(cookieName, cookieValue);
+                }
             }
-            Save();
+            Storage[userId] = userCookies;
+            try
+            {
+                Save();
+            }
+            catch (Exception ex)
+            {
+                // Handle the exception here. For example:
+                Console.WriteLine($"An error occurred while saving: {ex.Message}");
+            }
             return true;
         }
 

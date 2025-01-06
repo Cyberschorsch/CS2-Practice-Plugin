@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using static CSPracc.DataModules.Enums;
 using T3MenuSharedApi;
 
@@ -51,17 +52,80 @@ namespace CSPracc.Modes
                         bool isEnabled = boolOption.OptionDisplay!.Contains("✔");
                         if (isEnabled)
                         {
-                            ccsplayerController.SetOrAddValueOfCookie("PersonalizedNadeMenu", "yes");
+                            p.SetOrAddValueOfCookie("PersonalizedNadeMenu", "yes");
                         }
                         else
                         {
-                            ccsplayerController.SetOrAddValueOfCookie("PersonalizedNadeMenu", "no");
+                            p.SetOrAddValueOfCookie("PersonalizedNadeMenu", "no");
                         }
                     }
                     
                     
                 });
+            
+            // Allow choosing one or more roles to filter always filter nades by.
 
+            var availableRoles = projectileManager.GetAllRoles();
+
+            var rolesMenu = manager.CreateMenu("Filter by Roles", isSubMenu: true);
+            rolesMenu.ParentMenu = menu;
+            
+            ccsplayerController.GetValueOfCookie("Roles", out string? playerroles);
+            
+            foreach (var role in availableRoles)
+            {
+                CSPraccPlugin.Instance!.Logger.LogInformation(role);
+                if (playerroles != null)
+                {
+                    default_option_value = playerroles.Contains(role);    
+                }
+                else
+                {
+                    default_option_value = false;
+                }
+                
+                rolesMenu.AddBoolOption(role, default_option_value, (p, option) =>
+                {
+                    if (option is IT3Option boolOption)
+                    {
+                        bool isEnabled = boolOption.OptionDisplay!.Contains("✔");
+                        if (isEnabled)
+                        {
+                            if (playerroles == null)
+                            {
+                                playerroles = role;
+                            }
+                            else
+                            {
+                                playerroles += ' ' + role;    
+                            }
+                        }
+                        else
+                        {
+                            if (playerroles.Contains(role))
+                            {
+                                playerroles = playerroles.Replace(role, "");    
+                            }
+                        }
+                        CSPraccPlugin.Instance!.Logger.LogInformation(playerroles);
+                        bool result = p.SetOrAddValueOfCookie("Roles", playerroles);
+                        if (result)
+                        {
+                            CSPraccPlugin.Instance!.Logger.LogInformation("Success");
+                        }
+                        else
+                        {
+                            CSPraccPlugin.Instance!.Logger.LogInformation("Failure");
+                        }
+                    }
+                });
+                
+            }
+            menu.Add("Set Roles", (p, option) =>
+            {
+                manager.OpenSubMenu(ccsplayerController, rolesMenu);
+            });
+            
             return menu;
         }
 
