@@ -234,6 +234,9 @@ namespace CSPracc
             string strat = properties.ContainsKey("strat") ? properties["strat"].ToString().ToLower() : "";
             bool usePersonalNadeMenu = (bool)properties.ContainsKey("usePersonalNadeMenu") ? (bool)properties["usePersonalNadeMenu"] : false;
             
+            player.GetValueOfCookie("Roles", out string? playerRoles);
+            CSPraccPlugin.Instance!.Logger.LogInformation($"Player Roles: {playerRoles}");
+            
             bool FilterByTeam = CSPraccPlugin.Instance.Config.FilterByTeam;
             CSPraccPlugin.Instance!.Logger.LogInformation($"Filter by Team?: {FilterByTeam}");
             
@@ -280,7 +283,27 @@ namespace CSPracc
                         }
                     }
                 }
-
+                
+                // Filter by preconfigured roles if not explicitly called via menu.
+                if (string.IsNullOrEmpty(role) && !string.IsNullOrEmpty(playerRoles))
+                {
+                    CSPraccPlugin.Instance!.Logger.LogInformation($"Filter by preset roles.");
+                    string[] filterroles = playerRoles.Split(' ');
+                    bool not_found_any_role = true;
+                    foreach (string filterrole in filterroles)
+                    {
+                        if (snapshotContainRole(nade.Value, filterrole))
+                        {
+                            not_found_any_role = false;
+                        }
+                    }
+                    if (not_found_any_role)
+                    {
+                        CSPraccPlugin.Instance!.Logger.LogInformation($"Nade matches preset roles.");
+                        filter = false;
+                    }
+                }
+                
                 if (!string.IsNullOrEmpty(name))
                     if (!nade.Value.Title.Contains(name))
                         filter = false;
@@ -301,7 +324,11 @@ namespace CSPracc
                 }
 
                 if (filter)
+                {
+                    CSPraccPlugin.Instance!.Logger.LogInformation($"Adding nade.");
                     nade_result.Add(nade);
+                }
+                    
             }
             
             return nade_result;
@@ -372,8 +399,11 @@ namespace CSPracc
         
         private bool snapshotContainRole(ProjectileSnapshot snapshot, string roleToSearch)
         {
+            CSPraccPlugin.Instance!.Logger.LogInformation($"Looking for role {roleToSearch}");
+            
             foreach(string role in snapshot.Roles)
             {
+                CSPraccPlugin.Instance!.Logger.LogInformation($"Nade Role: {role}");
                 if(role.ToLower() == roleToSearch.ToLower()) return true;
             }
             return false;
