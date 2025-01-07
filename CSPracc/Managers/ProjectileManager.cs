@@ -666,19 +666,20 @@ namespace CSPracc
                         properties["isSubMenu"] = true;
                     
                         var submenu = GetPlayerBasedNadeMenu(player, properties);
-                        submenu.ParentMenu = stratMenu;
-                        // Build submenu for the nades.
-                        stratMenu.Add(strat, (p, option) =>
+                        if (submenu.Options.Count > 0)
                         {
-                            manager.OpenSubMenu(player, submenu);
-                        });
-                        strats.Add(strat);
+                            submenu.ParentMenu = stratMenu;
+                            // Build submenu for the nades.
+                            stratMenu.Add(strat, (p, option) =>
+                            {
+                                manager.OpenSubMenu(player, submenu);
+                            });
+                            strats.Add(strat);    
+                        }
                     }
-                    
                     
                 }
             }
-            
             return stratMenu;
         }
 
