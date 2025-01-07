@@ -77,17 +77,19 @@ namespace CSPracc.DataStorages.JsonStorages
             }
             else
             {
-                userCookies = new Dictionary<string, string>(userCookies); // Clone the existing dictionary to avoid null reference
-                if (userCookies.ContainsKey(cookieName))
+                if (userCookies == null)
                 {
-                    userCookies[cookieName] = cookieValue;
+                    userCookies = new Dictionary<string, string>();
+                    userCookies.Add(cookieName, cookieValue);
+                    Storage[userId] = userCookies;
                 }
                 else
                 {
-                    userCookies.Add(cookieName, cookieValue);
+                    userCookies = new Dictionary<string, string>(userCookies); // Clone the existing dictionary to avoid null reference
+                    userCookies[cookieName] = cookieValue;
+                    Storage[userId] = userCookies; // Update the original variable with the new data
                 }
             }
-            Storage[userId] = userCookies;
             try
             {
                 Save();
