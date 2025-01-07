@@ -288,7 +288,7 @@ namespace CSPracc
                 if (string.IsNullOrEmpty(role) && !string.IsNullOrEmpty(playerRoles))
                 {
                     CSPraccPlugin.Instance!.Logger.LogInformation($"Filter by preset roles.");
-                    string[] filterroles = playerRoles.Split(' ');
+                    string[] filterroles = playerRoles.Split(',');
                     bool not_found_any_role = true;
                     foreach (string filterrole in filterroles)
                     {

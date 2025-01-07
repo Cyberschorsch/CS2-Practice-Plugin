@@ -67,59 +67,94 @@ namespace CSPracc.Modes
 
             var availableRoles = projectileManager.GetAllRoles();
 
+            // Create roles menu
             var rolesMenu = manager.CreateMenu("Filter by Roles", isSubMenu: true);
             rolesMenu.ParentMenu = menu;
-            
-            ccsplayerController.GetValueOfCookie("Roles", out string? playerroles);
-            
-            foreach (var role in availableRoles)
+
+            // Get current player roles from cookie
+            ccsplayerController.GetValueOfCookie("Roles",  out string? playerRoles);
+            if (playerRoles != null)
             {
-                CSPraccPlugin.Instance!.Logger.LogInformation(role);
-                if (playerroles != null)
+                CSPraccPlugin.Instance!.Logger.LogInformation($"Current player roles:{playerRoles}");
+                // Convert player roles to list if it's not already a list
+                var rolesList = new List<string>(playerRoles.Split(','));
+                foreach (var role in availableRoles)
                 {
-                    default_option_value = playerroles.Contains(role);    
-                }
-                else
-                {
-                    default_option_value = false;
-                }
-                
-                rolesMenu.AddBoolOption(role, default_option_value, (p, option) =>
-                {
-                    if (option is IT3Option boolOption)
+                    // Create option for each role and set default value based on whether the role is in the player's list
+                    bool defaultOptionValue = rolesList.Contains(role);
+                    
+                    // Add option to menu
+                    rolesMenu.AddBoolOption(role, defaultOptionValue, (p, option) =>
                     {
-                        bool isEnabled = boolOption.OptionDisplay!.Contains("✔");
-                        if (isEnabled)
+                        if (option is IT3Option boolOption)
                         {
-                            if (playerroles == null)
+                            var isEnabled = boolOption.OptionDisplay!.Contains("✔");
+                            
+                            // Handle button click
+                            if (isEnabled)
                             {
-                                playerroles = role;
+                                if (!rolesList.Contains(role))
+                                {
+                                    rolesList.Add(role);
+                                }
                             }
                             else
                             {
-                                playerroles += ' ' + role;    
+                                if (rolesList.Contains(role))
+                                {
+                                    rolesList.Remove(role);
+                                }
                             }
+                            
+                            // Update cookie with player's selected roles
+                            string updatedRoles = string.Join(",", rolesList);
+                            p.SetOrAddValueOfCookie("Roles", updatedRoles);
                         }
-                        else
-                        {
-                            if (playerroles.Contains(role))
-                            {
-                                playerroles = playerroles.Replace(role, "");    
-                            }
-                        }
-                        CSPraccPlugin.Instance!.Logger.LogInformation(playerroles);
-                        bool result = p.SetOrAddValueOfCookie("Roles", playerroles);
-                        if (result)
-                        {
-                            CSPraccPlugin.Instance!.Logger.LogInformation("Success");
-                        }
-                        else
-                        {
-                            CSPraccPlugin.Instance!.Logger.LogInformation("Failure");
-                        }
-                    }
-                });
+                    });
+                }
+            }
+            else
+            {
+                CSPraccPlugin.Instance!.Logger.LogInformation($"Player has no roles configured.");
+                // If no roles are saved in the cookie, initialize it.
+                var rolesList = new List<string>();
                 
+                foreach (var role in availableRoles)
+                {
+                    rolesMenu.AddBoolOption(role, false, (p, option) =>
+                    {
+                        if (option is IT3Option boolOption)
+                        {
+                            var isEnabled = boolOption.OptionDisplay!.Contains("✔");
+                            
+                            // Handle button click
+                            if (isEnabled)
+                            {
+                                if (!rolesList.Contains(role))
+                                {
+                                    rolesList.Add(role);
+                                }
+                            }
+                            else
+                            {
+                                if (rolesList.Contains(role))
+                                {
+                                    rolesList.Remove(role);
+                                }
+                            }
+                            
+                            // Update cookie with player's selected roles
+                            string updatedRoles = string.Join(",", rolesList);
+                            
+                            if (string.IsNullOrEmpty(updatedRoles))
+                            {
+                                updatedRoles = "";
+                            }
+                            CSPraccPlugin.Instance!.Logger.LogInformation($"Updated player roles:{updatedRoles}");
+                            p.SetOrAddValueOfCookie("Roles", updatedRoles);
+                        }
+                    });
+                }
             }
             menu.Add("Set Roles", (p, option) =>
             {
