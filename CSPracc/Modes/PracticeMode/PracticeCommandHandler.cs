@@ -17,6 +17,7 @@ using CSPracc.Modes;
 using CounterStrikeSharp.API.Modules.Memory.DynamicFunctions;
 using System.Reflection.Metadata.Ecma335;
 using CounterStrikeSharp.API.Modules.Cvars;
+using CounterStrikeSharp.API.Modules.Events;
 
 namespace CSPracc.CommandHandler
 {

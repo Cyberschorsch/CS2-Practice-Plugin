@@ -15,6 +15,7 @@ using CounterStrikeSharp.API.Modules.Utils;
 using CSPracc.Modes;
 using CounterStrikeSharp.API.Modules.Admin;
 using CounterStrikeSharp.API.Modules.Commands;
+using CounterStrikeSharp.API.Modules.Events;
 
 namespace CSPracc.CommandHandler
 {
